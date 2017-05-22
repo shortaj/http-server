@@ -10,3 +10,4 @@ client.connect(stream_info[-1])
 
 message = u'This is a test message.'
 client.sendall(message.encode('utf8'))
+client.close()
