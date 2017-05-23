@@ -1,7 +1,11 @@
 
 """Client side communication."""
+import sys
 import socket
+
+
 def talk(message):
+    """."""
     infos = socket.getaddrinfo('127.0.0.1', 5000)
     len(infos)
 
@@ -21,4 +25,5 @@ def talk(message):
     return mess
 
 
-talk('hi')
+if __name__ == '__main__':
+    print(talk(sys.argv[1]))

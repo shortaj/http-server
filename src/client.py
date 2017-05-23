@@ -16,10 +16,12 @@ def talk(message):
     buffer_length = 8
     reply = False
     mess = ''
+    print('hello')
     while not reply:
         part = client.recv(buffer_length)
         mess = mess + part.decode('utf8')
-        if len(part) < buffer_length:
+        print(mess)
+        if len(part) <= buffer_length or len(part) is 0:
             break
     client.close()
     return mess
