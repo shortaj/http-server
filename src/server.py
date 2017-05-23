@@ -2,7 +2,7 @@ import socket
 server = socket.socket(socket.AF_INET,
                        socket.SOCK_STREAM,
                        socket.IPPROTO_TCP)
-address = ('127.0.0.1',5000)
+address = ('127.0.0.1',5001)
 server.bind(address)
 while True:
     server.listen(1)
@@ -13,8 +13,8 @@ while True:
     while not message_complete:
         part = conn.recv(buffer_length)
         message = message + part.decode('utf8')
-        if len(part) < buffer_length:
+        if message == '':
             break
-    conn.sendall(message.encode('utf8'))
+        conn.sendall(message.encode('utf8'))
+        message = ''
     conn.close()
-
