@@ -5,6 +5,7 @@ import socket
 
 def talk(message):
     """."""
+    print(message)
     infos = socket.getaddrinfo('127.0.0.1', 5001)
     len(infos)
     buffer_length = 8
