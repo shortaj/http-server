@@ -19,11 +19,11 @@ def talk(message):
         while not reply:
             part = client.recv(buffer_length)
             mess = mess + part.decode('utf8')
-            if mess == message + '200 OK' and part.decode('utf8') == '200 OK':
-                print(mess[:len(mess) - 6])
+            if mess.endswith('\r\n\r\n'):
+                #print(mess[:len(mess) - 6])
                 break
         client.close()
-        return mess[len(mess) - 6:]
+        return mess
 
 
 if __name__ == '__main__':

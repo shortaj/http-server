@@ -7,12 +7,12 @@ import math
 
 def response_ok():
     """."""
-    return '200 OK'
+    return b'HTTP/1.1 200 OK\r\n\r\n'
 
 
 def response_error():
     """."""
-    return '500 Internal Server Error'
+    return b'HTTP/1.1 500 Internal Server Error\r\n\r\n'
 
 
 try:
@@ -21,7 +21,7 @@ try:
                            socket.IPPROTO_TCP)
     address = ('127.0.0.1', 5000)
     server.bind(address)
-    print('Echo server is running.')
+    print('Server is running.')
     while True:
         server.listen(1)
         conn, addr = server.accept()
@@ -37,12 +37,13 @@ try:
         for i in range(iterations):
             part = conn.recv(buffer_length)
             message += part.decode('utf8')
-        conn.sendall(message.encode('utf8'))
+        #conn.sendall(message.encode('utf8'))
+        print(message)
         message = ''
-        conn.send(response_ok().encode('utf8'))
+        conn.send(response_ok())
         conn.close()
 
 except KeyboardInterrupt:
     server.close()
-    print('Echo server is closed.')
+    print('Server is closed.')
     sys.exit()
