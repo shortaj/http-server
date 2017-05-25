@@ -5,6 +5,11 @@ import socket
 import math
 
 
+def parse_request(request):
+    """."""
+    pass
+
+
 def response_ok():
     """."""
     return b'HTTP/1.1 200 OK\r\n\r\n'
