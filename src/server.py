@@ -1,16 +1,27 @@
 """Server creation for echo assignment."""
 
+import os
 import sys
 import socket
 import math
 
 
-def response_ok():
+def file_open_read_close(path):
+    """Open, read, encode, and close the file at the given path."""
+    req_file = os.open(path, os.O_RDWR)
+    file_info = os.read(req_file).encode('utf-8')
+    os.close(req_file)
+    return file_info
+
+
+def response_ok(file):
     """Response will now give return 200 code plus body."""
-    return b'HTTP/1.1 200 OK\r\n\r\n'
+    reply = b'HTTP/1.1 200 OK\r\n\r\n'
+    response = reply + file
+    return conn.sendall(response)
 
 
-def response_error(x = 500):
+def response_error(x=500):
     """Response error will return the proper Error Codes."""
     if x == 500:
         return b'HTTP/1.1 500 Internal Server Error\r\n\r\n'
@@ -20,6 +31,7 @@ def response_error(x = 500):
         return b'HTTP/1.1 505 HTTP Version Not Supported\r\n\r\n'
     elif x == 400:
         return b'HTTP/1.1 400 Bad Request\r\n\r\n'
+
 
 def parse_request(message):
     """Parse request takes in the incoming message from client and examines the request."""
@@ -35,7 +47,6 @@ def parse_request(message):
     if 'Host' not in message[26:] or not ( message.endswith('\r\n\r\n') or message.endswith('\\r\\n\\r\\n')):
         return response_error(400)
     return response_ok()
-    
 
 
 try:
