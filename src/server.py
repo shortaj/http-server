@@ -14,7 +14,7 @@ def file_open_read_close(path):
     return file_info
 
 
-def response_ok(file):
+def response_ok(file=''):
     """Response will now give return 200 code plus body."""
     reply = b'HTTP/1.1 200 OK\r\n\r\n'
     response = reply + file
