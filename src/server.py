@@ -24,8 +24,8 @@ def response_error(x = 500):
 def parse_request(message):
     print(message[:4])
     print(message[4:15])
-    print(message[15:26])
-    print(message[26:])
+    print(message[15:28])
+    print(message[28:])
     if message[:4] == 'GET 'or message[:7] == 'DELETE ' or message[:5] == 'POST 'or message[:4] == 'PUT ':
         if message[:4] != 'GET ':
             return response_error(405)
@@ -33,9 +33,9 @@ def parse_request(message):
         return response_error(400)
     if message[4:15] != '/server.py ':
         return response_error(400)
-    if 'HTTP/1.1' not in message[15:26] or not (message[15:26].endswith('\r\n ') or message[15:26].endswith('\\r\\n ')):
+    if 'HTTP/1.1' not in message[15:26] or not (message[15:26].endswith('\r\n ') or message[15:28].endswith('\\r\\n ')):
         return response_error(505)
-    if 'Host' not in message[26:] or not ( message.endswith('\r\n\r\n') or message.endswith('\\r\\n\\r\\n')):
+    if 'Host' not in message[28:] or not ( message.endswith('\r\n\r\n') or message.endswith('\\r\\n\\r\\n')):
         return response_error(400)
     return response_ok()
     
