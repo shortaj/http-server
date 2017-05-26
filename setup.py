@@ -2,7 +2,7 @@
 
 from setuptools import setup
 
-dependencies = ['ipython', 'pytest', 'pytest-watch']
+dependencies = ['ipython', 'pytest', 'pytest-watch', 'os', 'math', 'sys']
 
 setup(
     name='client',
