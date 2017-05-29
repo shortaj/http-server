@@ -7,14 +7,26 @@ import os
 
 def file_open_close(path):
     """Open, read, and close the file a tthe given path"""
-    req_file = os.open(path,os.O_RDWR)
-    file_info = os.read(req_file).encode('uft-8')
-    os.close(req_file)
+    file_info = ''
+    req_file = ''
+    if '.jpg' in path or '.png' in path:
+        print('hi')
+        req_file = open(path,'rb')
+        file_info = req_file.read()
+    else:
+        req_file = open(path,'r')
+        file_info = req_file.read().encode('utf-8')
+    req_file.close()
     return file_info
 
 def resolve_uri(message):
-    path = message[message.index('/'):message.index('HTTP')]
-    if os.path.exists(path):
+    path=message[message.index('/'):message.index('HTTP')]
+    path = path[:len(path)-1]
+    #path = os.path.join(os.getcwd(), path)
+    #print(os.getcwd())
+    path = os.getcwd() +path
+    real = os.path.lexists(path)
+    if real:
         return path
     return False
 
@@ -46,10 +58,11 @@ def parse_request(message):
             return response_error(405)
     else:
         return response_error(400)
-    if 'HTTP/1.1' not in resolve_uri(message) or not (message[message.index('HTTP'):message.index('HTTP') + 11].endswith('\r\n ') or message[message.index('HTTP'):message.index('HTTP') + 13].endswith('\\r\\n ')):
-        print(message[message.index('HTTP'):message.index('HTTP') + 11] + 'HI ALLL')
+    if 'HTTP/1.1' not in message:# or not (message[message.index('HTTP'):message.index('HTTP') + 11].endswith('\r\n ') or message[message.index('HTTP'):message.index('HTTP') + 13].endswith('\\r\\n ')):
         return response_error(505)
-    if 'Host' not in message[message.index('HTTP') + 11:] or not ( message.endswith('\r\n\r\n') or message.endswith('\\r\\n\\r\\n')):
+    if 'Host' not in message or not ( message.endswith('\r\n\r\n') or  message.endswith('\\r\\n\\r\\n')):
+        if message.endswith('\r\n\r\n'):
+            print('I am here')
         return response_error(400)
     return response_ok()
     
@@ -63,7 +76,6 @@ try:
     server.bind(address)
     print('Server is running.')
     while True:
-        print('START')
         server.listen(1)
         conn, addr = server.accept()
         buffer_length = 8
@@ -71,26 +83,31 @@ try:
         message = ''
         flag = 1
         i = 0
+        current_message_len = 0
+        pro_message_len = buffer_length
         bitmessage = b''
-        while  not message.endswith('\r\n\r\n') or  not part.endswith(b'\r\n\r\n'):
+        while  not message.endswith('\r\n\r\n') or not part.endswith(b'\r\n\r\n'):
+            #print(1)
             flag = 0
             part = conn.recv(buffer_length)
             bitmessage += part
             message += part.decode('utf8')
-        #print(message)
-        print('here')
+            current_message_len = len(message)
+            if current_message_len != pro_message_len:
+                break
+            else:
+                pro_message_len += buffer_length
+        print(2)
         t = parse_request(message)
-        #print(t)
-        conn.close()
-        break
+        print(3)
         if b'200' in t:
-            print('hIAALL')
             path = resolve_uri(message)
+            print(path)
             if path:
-                conn.send(response_ok(path))
+                conn.send(response_ok(file_open_close(path)))
             else:
                 conn.send(parse_request(message))
-                break
+        conn.close()
         #conn.send(response_ok())
 
 except KeyboardInterrupt:
