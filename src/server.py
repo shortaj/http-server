@@ -10,7 +10,7 @@ def response_ok():
     return b'HTTP/1.1 200 OK\r\n\r\n'
 
 
-def response_error(x = 500):
+def response_error(x=500):
     """."""
     if x == 500:
         return b'HTTP/1.1 500 Internal Server Error\r\n\r\n'
@@ -21,7 +21,9 @@ def response_error(x = 500):
     elif x == 400:
         return b'HTTP/1.1 400 Bad Request\r\n\r\n'
 
+
 def parse_request(message):
+    """Parse client request and sends appropriate response."""
     if message[:4] == 'GET 'or message[:7] == 'DELETE ' or message[:5] == 'POST 'or message[:4] == 'PUT ':
         if message[:4] != 'GET ':
             return response_error(405)
@@ -31,10 +33,9 @@ def parse_request(message):
         return response_error(400)
     if 'HTTP/1.1' not in message[15:26] or not (message[15:26].endswith('\r\n ') or message[15:28].endswith('\\r\\n ')):
         return response_error(505)
-    if 'Host' not in message[26:] or not ( message.endswith('\r\n\r\n') or message.endswith('\\r\\n\\r\\n')):
+    if 'Host' not in message[28:] or not (message.endswith('\r\n\r\n') or message.endswith('\\r\\n\\r\\n')):
         return response_error(400)
     return response_ok()
-    
 
 
 try:
@@ -59,10 +60,8 @@ try:
         for i in range(iterations):
             part = conn.recv(buffer_length)
             message += part.decode('utf8')
-        #conn.sendall(message.encode('utf8'))
         conn.send(parse_request(message))
         message = ''
-        #conn.send(response_ok())
         conn.close()
 
 except KeyboardInterrupt:
