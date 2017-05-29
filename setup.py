@@ -6,7 +6,7 @@ dependencies = ['ipython', 'pytest', 'pytest-watch', 'os', 'math', 'sys']
 
 setup(
     name='client',
-    description='Client and Server echo.',
+    description='Client and Server Step3 File Access.',
     version='0.5',
     author='Sean Beseler and Alex Short',
     author_email='ajshort2010@hotmail.com',
