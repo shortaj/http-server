@@ -13,11 +13,10 @@ def file_open_close(path):
     return file_info
 
 def resolve_uri(message):
-    path=message[message.index('/'):message.index('HTTP')]
-    real = os.path.exists(path)
-    if real:
+    path = message[message.index('/'):message.index('HTTP')]
+    if os.path.exists(path):
         return path
-    return real
+    return False
 
 def response_ok(new_file = b''):
     """Response will now geive return 200 code plus body"""
