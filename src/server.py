@@ -11,7 +11,6 @@ def file_open_close(path):
     file_info = ''
     req_file = ''
     if '.jpg' in path or '.png' in path:
-        print('hi')
         req_file = open(path, 'rb')
         file_info = req_file.read()
     else:
@@ -55,7 +54,6 @@ def response_error(x=500):
 
 def parse_request(message):
     """Parse request takes in the incoming message for the client."""
-    print(message)
     if message[:4] == 'GET 'or message[:7] == 'DELETE ' or message[:5] == 'POST 'or message[:4] == 'PUT ':
         if message[:4] != 'GET ':
             return response_error(405)
@@ -65,8 +63,7 @@ def parse_request(message):
         return response_error(505)
     if 'Host' not in message or not (message.endswith('\r\n\r\n') or message.endswith('\\r\\n\\r\\n')):
         if message.endswith('\r\n\r\n'):
-            print('I am here')
-        return response_error(400)
+            return response_error(400)
     return response_ok()
 
 
@@ -76,28 +73,32 @@ try:
                            socket.IPPROTO_TCP)
     address = ('127.0.0.1', 5001)
     server.bind(address)
-    server.listen(1)
+    server.listen(5)
     print('Server is running.')
     channels = [server, sys.stdin]
     buffer_length = 8
-    while True:
+    running = True
+    while running:
         read_ready, write_ready, except_ready = select.select(channels, [], [], 0)
+        flag = 0
         for readable in read_ready:
+            print(readable)
             if readable is server:
+                print(2)
                 conn, addr = server.accept()
-                channels.append(handler_socket)
+                channels.append(conn)
             elif readable is sys.stdin:
+                print(3)
                 sys.stdin.readline()
-                break
+                running = False
             else:
                 message_complete = False
                 message = ''
-                i = 0
                 current_message_len = 0
                 pro_message_len = buffer_length
                 bitmessage = b''
-                while not message.endswith('\r\n\r\n') or not part.endswith(b'\r\n\r\n'):
-                    part = conn.recv(buffer_length)
+                while not message.endswith('\r\n\r\n') or not part.endswith(b'\r\n\r\n') and flag == 0:
+                    part = readable.recv(buffer_length)
                     bitmessage += part
                     message += part.decode('utf8')
                     current_message_len = len(message)
@@ -105,18 +106,19 @@ try:
                         break
                     else:
                         pro_message_len += buffer_length
-                print(2)
+
                 t = parse_request(message)
-                print(3)
                 if b'200' in t:
                     path = resolve_uri(message)
-                    print(path)
-                    if path:
+                    if path and flag == 0:
+                        flag += 1
+                        print('1')
                         conn.send(response_ok(file_open_close(path)))
                     else:
                         conn.send(parse_request(message))
-                conn.close()
+                readable.close()
                 channels.remove(readable)
+                break
 except KeyboardInterrupt:
     server.close()
     print('Server is closed.')
